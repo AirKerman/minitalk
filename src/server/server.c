@@ -6,12 +6,13 @@
 /*   By: rkerman <rkerman@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:07:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/03/26 15:30:19 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/03/26 15:50:52 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 #include <unistd.h>
+#include <signal.h>
 
 int	ft_strlen(char *str)
 {
@@ -52,7 +53,6 @@ void	ft_putpid(pid_t n)
 	else
 	{
 		n += 48;
-		
 		write(1, &n, 1);
 	}
 }
@@ -61,7 +61,11 @@ void	ft_putpid(pid_t n)
 int	main(void)
 {
 	banner();
+	write(1, "                                                            |", 61);
+	write(1, "PID : ", 6);
 	ft_putpid(getpid());
+	write(1, "|                                                            ", 61);
+
 	while (1)
 	{
 	}
