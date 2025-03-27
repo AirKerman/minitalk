@@ -6,7 +6,7 @@
 /*   By: rkerman <rkerman@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:07:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/03/26 15:50:52 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/03/27 14:14:07 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,15 +58,29 @@ void	ft_putpid(pid_t n)
 }
 
 #include <stdio.h>
+
+void signal_handler(int signum, siginfo_t *siginfo, void *ucontext)
+{
+	printf("%s\n", (char *)ucontext);
+    if (signum != SIGUSR1) return;
+    if (siginfo->si_code != SI_QUEUE) return;
+    printf("receiver: Got value %d\n",
+        siginfo->si_int);
+}
 int	main(void)
 {
+	struct sigaction	sig;
+
+	sig.sa_sigaction = signal_handler;
+	sigemptyset(&sig.sa_mask);
+	sig.sa_flags = SA_SIGINFO;
+	sigaction(SIGUSR1, &sig, NULL);
 	banner();
 	write(1, "                                                            |", 61);
 	write(1, "PID : ", 6);
 	ft_putpid(getpid());
-	write(1, "|                                                            ", 61);
-
+	write(1, "|                                                            \n", 62);
 	while (1)
-	{
-	}
+		sleep(100);
+	return (1);
 }
