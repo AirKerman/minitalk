@@ -6,13 +6,15 @@
 /*   By: rkerman <rkerman@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:07:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/03/27 14:14:07 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/04/02 15:38:45 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 #include <unistd.h>
 #include <signal.h>
+
+int	bit;
 
 int	ft_strlen(char *str)
 {
@@ -59,13 +61,23 @@ void	ft_putpid(pid_t n)
 
 #include <stdio.h>
 
-void signal_handler(int signum, siginfo_t *siginfo, void *ucontext)
+void signal_handler(int signum, siginfo_t *info, void *ucontext)
 {
-	printf("%s\n", (char *)ucontext);
-    if (signum != SIGUSR1) return;
-    if (siginfo->si_code != SI_QUEUE) return;
-    printf("receiver: Got value %d\n",
-        siginfo->si_int);
+	(void)ucontext;
+	static unsigned char c;
+	if (!bit)
+		bit = 8;	
+    if (signum == 10)
+		c = (c & ~(1U << (bit - 1))) + (1 << (bit - 1));
+    if (signum == 12)
+		c = (c & ~(1U << (bit - 1))) + (0 << (bit - 1));
+	bit--;
+	if (!bit)
+	{
+		printf("\n%d\n", info->si_pid);
+		printf("\n%c\n", c);
+	}
+
 }
 int	main(void)
 {
@@ -75,12 +87,13 @@ int	main(void)
 	sigemptyset(&sig.sa_mask);
 	sig.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &sig, NULL);
+	sigaction(SIGUSR2, &sig, NULL);
 	banner();
 	write(1, "                                                            |", 61);
 	write(1, "PID : ", 6);
 	ft_putpid(getpid());
 	write(1, "|                                                            \n", 62);
 	while (1)
-		sleep(100);
+		pause();
 	return (1);
 }

@@ -16,6 +16,10 @@ CFLAGS		=	-Wall -Werror	-Wextra -g -I includes
 RM			=	rm -f
 
 
+
+.PHONY:		all
+all:		client server
+
 .PHONY:		client
 client:		$(OBJ_C)
 			$(CC) $(CFLAGS) $(OBJ_C) -o $(NAME_C)
