@@ -6,7 +6,7 @@
 /*   By: rkerman <rkerman@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:07:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/04/05 15:30:48 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/04/05 16:11:14 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,11 +73,9 @@ void signal_handler(int signum, siginfo_t *info, void *ucontext)
 		c = (c & ~(1U << (bit - 1))) + (0 << (bit - 1));
 	bit--;
 	if (!bit)
-	{
 		write(1, &c, 1);
-		sleep(2);
-		kill(info->si_pid, SIGUSR1);
-	}
+	usleep(200);
+	kill(info->si_pid, SIGUSR1);
 }
 int	main(void)
 {
