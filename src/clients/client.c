@@ -6,7 +6,7 @@
 /*   By: rkerman <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:08:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/04/03 23:06:24 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/04/05 15:31:22 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,8 @@ int		ft_atoi(char *str)
 void signal_handler(int signum, siginfo_t *info, void *ucontext)
 {
 	(void)ucontext;
-	(void)info;
 	(void)signum;
+	(void)info;
 }
 
 void	sending_str(int pid, char *str)
@@ -56,17 +56,16 @@ void	sending_str(int pid, char *str)
 	while (*str)
 	{
 		itr = 7;
-		while (1)
+		while (itr >= 0)
 		{
-			usleep(100);
 			if (*str & (1 << itr))
 				kill(pid, SIGUSR1);
 			else
 				kill(pid, SIGUSR2);
+			usleep(100);
 			itr--;
-			if (!(itr >= 0))
-				break ;
 		}
+		pause();
 		str++;
 	}
 	
@@ -82,8 +81,5 @@ int main(int argc, char **argv)
 	sig.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &sig, NULL);
 	if (argc - 1 == 2 && (pid = ft_atoi(argv[1])))
-	{
 		sending_str(pid, argv[2]);
-	}
-
 }

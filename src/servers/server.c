@@ -6,7 +6,7 @@
 /*   By: rkerman <rkerman@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:07:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/04/03 23:08:20 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/04/05 15:30:48 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,8 @@ void signal_handler(int signum, siginfo_t *info, void *ucontext)
 	if (!bit)
 	{
 		write(1, &c, 1);
-		kill(info->si_signo, SIGUSR1);
+		sleep(2);
+		kill(info->si_pid, SIGUSR1);
 	}
 }
 int	main(void)
@@ -93,6 +94,6 @@ int	main(void)
 	ft_putpid(getpid());
 	write(1, "|                                                            \n", 62);
 	while (1)
-		pause();
+		sleep(1);
 	return (1);
 }
