@@ -6,18 +6,20 @@
 /*   By: rkerman <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:08:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/04/05 22:12:40 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/04/05 22:36:09 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
-# include <signal.h>
-# include <stdlib.h>
-# include <stdio.h>
-# include <time.h>
-# include <unistd.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#include <unistd.h>
 
-int		ft_atoi(char *str)
+int	g_pause;
+
+int	ft_atoi(char *str)
 {
 	int	count;
 	int	neg;
@@ -42,14 +44,12 @@ int		ft_atoi(char *str)
 	return (count * neg);
 }
 
-int	p;
-
-void signal_handler(int signum, siginfo_t *info, void *ucontext)
+void	signal_handler(int signum, siginfo_t *info, void *ucontext)
 {
 	(void)ucontext;
 	(void)info;
 	if (signum == 10)
-		p = 0;
+		g_pause = 0;
 }
 
 void	sending_str(int pid, char *str)
@@ -61,9 +61,9 @@ void	sending_str(int pid, char *str)
 		itr = 7;
 		while (itr >= 0)
 		{
-			while (p)
+			while (g_pause)
 				;
-			p = 1;
+			g_pause = 1;
 			if (*str & (1 << itr))
 				kill(pid, SIGUSR1);
 			else
@@ -72,18 +72,18 @@ void	sending_str(int pid, char *str)
 		}
 		str++;
 	}
-	
 }
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-	int	pid;
-	struct sigaction        sig;
+	struct sigaction	sig;
+	int					pid;
 
 	sig.sa_sigaction = signal_handler;
 	sigemptyset(&sig.sa_mask);
 	sig.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &sig, NULL);
-	if (argc - 1 == 2 && (pid = ft_atoi(argv[1])))
+	pid = ft_atoi(argv[1]);
+	if (argc - 1 == 2 && pid)
 		sending_str(pid, argv[2]);
 }
