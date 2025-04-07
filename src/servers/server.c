@@ -6,13 +6,11 @@
 /*   By: rkerman <rkerman@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:07:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/04/05 22:34:56 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/04/07 14:34:12 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
-#include <unistd.h>
-#include <signal.h>
 
 int	bit;
 
@@ -59,21 +57,40 @@ void	ft_putpid(pid_t n)
 	}
 }
 
-#include <stdio.h>
+/*int	ft_atoi(char *str)
+{
 
+}
+*/
+#include <stdio.h>
+/*
+char	*ft_strjoin(unsigned char *s, unsigned char c)
+{
+	unsigned char *str;
+
+	str 
+}
+*/
 void signal_handler(int signum, siginfo_t *info, void *ucontext)
 {
 	(void)ucontext;
-	static unsigned char c;
+	static long long c;
+//	unsigned char cha;
+//	static unsigned char *s;
+
 	if (!bit)
-		bit = 8;
+		bit = 64;
 	if (signum == 10)
-		c = (c & ~(1U << (bit - 1))) + (1 << (bit - 1));
+		c = (c & ~(1 << (bit - 1))) + (1 << (bit - 1));
 	if (signum == 12)
-		c = (c & ~(1U << (bit - 1))) + (0 << (bit - 1));
+		c = (c & ~(1 << (bit - 1))) + (0 << (bit - 1));
 	bit--;
 	if (!bit)
+	{
+//		s = ft_strjoin(s, c);
+		printf("%lld\n", c);
 		write(1, &c, 1);
+	}
 	kill(info->si_pid, SIGUSR1);
 }
 int	main(void)

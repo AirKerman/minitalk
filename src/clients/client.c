@@ -6,23 +6,20 @@
 /*   By: rkerman <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:08:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/04/05 22:36:09 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/04/07 14:33:37 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
-#include <signal.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
-#include <unistd.h>
+
 
 int	g_pause;
 
-int	ft_atoi(char *str)
+long long	ft_atoi(char *str)
 {
-	int	count;
-	int	neg;
+	long long	count;
+	long long	neg;
 
 	neg = 1;
 	count = 0;
@@ -52,7 +49,17 @@ void	signal_handler(int signum, siginfo_t *info, void *ucontext)
 		g_pause = 0;
 }
 
-void	sending_str(int pid, char *str)
+int	ft_strlen(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
+}
+
+void	sender_str(int pid, char *str)
 {
 	int	itr;
 
@@ -62,7 +69,7 @@ void	sending_str(int pid, char *str)
 		while (itr >= 0)
 		{
 			while (g_pause)
-				;
+				usleep(0);
 			g_pause = 1;
 			if (*str & (1 << itr))
 				kill(pid, SIGUSR1);
@@ -73,6 +80,25 @@ void	sending_str(int pid, char *str)
 		str++;
 	}
 }
+
+void	sender_len(int p, long long l)
+{
+	long long	itr;
+
+	itr = 63;
+	while (itr >= 0)
+	{
+		while (g_pause)
+			usleep(0);
+		g_pause = 1;
+		if (l & (1 << itr))
+			kill(p, SIGUSR1);
+		else
+			kill(p, SIGUSR2);
+		itr--;
+	}
+}
+
 
 int	main(int argc, char **argv)
 {
@@ -85,5 +111,6 @@ int	main(int argc, char **argv)
 	sigaction(SIGUSR1, &sig, NULL);
 	pid = ft_atoi(argv[1]);
 	if (argc - 1 == 2 && pid)
-		sending_str(pid, argv[2]);
+		sender_len(pid, ft_atoi(argv[2]));
+		//sender_str(pid, argv[2]);
 }
