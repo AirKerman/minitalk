@@ -6,13 +6,11 @@
 /*   By: rkerman <rkerman@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:07:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/04/07 14:34:12 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/04/09 18:12:49 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
-
-int	bit;
 
 int	ft_strlen(char *str)
 {
@@ -57,41 +55,63 @@ void	ft_putpid(pid_t n)
 	}
 }
 
-/*int	ft_atoi(char *str)
-{
-
-}
-*/
 #include <stdio.h>
-/*
-char	*ft_strjoin(unsigned char *s, unsigned char c)
-{
-	unsigned char *str;
 
-	str 
-}
-*/
 void signal_handler(int signum, siginfo_t *info, void *ucontext)
 {
 	(void)ucontext;
-	static long long c;
-//	unsigned char cha;
-//	static unsigned char *s;
+	static char c;
+	static char *s;
+	static int		len;
+	static int		bit;
+	static int		i;
+	static int		j;
 
-	if (!bit)
-		bit = 64;
-	if (signum == 10)
-		c = (c & ~(1 << (bit - 1))) + (1 << (bit - 1));
-	if (signum == 12)
-		c = (c & ~(1 << (bit - 1))) + (0 << (bit - 1));
-	bit--;
-	if (!bit)
+	if (i < 32)
 	{
-//		s = ft_strjoin(s, c);
-		printf("%lld\n", c);
-		write(1, &c, 1);
+		if (signum == 10)
+			len = (len | (1 << (31 - i)));
+		kill(info->si_pid, SIGUSR1);
+		i++;
 	}
-	kill(info->si_pid, SIGUSR1);
+	else
+	{
+		if (!s)
+		{
+			s = malloc(len + 1 * sizeof(char));
+			if (!s)
+			{
+				kill(info->si_pid, SIGUSR2);
+				exit(1);
+			}
+		}
+		if (!bit)
+			bit = 8;
+		if (signum == 10)
+			c = (c & ~(1 << (bit - 1))) + (1 << (bit - 1));
+		if (signum == 12)
+			c = (c & ~(1 << (bit - 1)));
+		bit--;
+		if (!bit)
+		{
+			if (c != '\0')
+			{
+				s[j] = (char)c;
+				j++;
+			}
+			else
+			{
+				s[j] = (char)c;
+				write(1, s, ft_strlen(s));
+				write(1, "\n", 1);
+				i = 0;
+				j = 0;
+				free(s);
+				s = NULL;
+			}
+		}
+		kill(info->si_pid, SIGUSR1);
+	}
 }
 int	main(void)
 {
@@ -99,7 +119,7 @@ int	main(void)
 
 	sig.sa_sigaction = signal_handler;
 	sigemptyset(&sig.sa_mask);
-	sig.sa_flags = SA_SIGINFO;
+	sig.sa_flags = SA_RESTART | SA_SIGINFO;
 	sigaction(SIGUSR1, &sig, NULL);
 	sigaction(SIGUSR2, &sig, NULL);
 	banner();
@@ -107,6 +127,7 @@ int	main(void)
 	write(1, "PID : ", 6);
 	ft_putpid(getpid());
 	write(1, "|                                                            \n", 62);
+	
 	while (1)
 		pause();
 	return (1);

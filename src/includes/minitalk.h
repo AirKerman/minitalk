@@ -6,10 +6,11 @@
 /*   By: rkerman <rkerman@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:22:39 by rkerman           #+#    #+#             */
-/*   Updated: 2025/04/07 13:20:20 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/04/09 17:56:17 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include <signal.h>
+#include <stdlib.h>
 

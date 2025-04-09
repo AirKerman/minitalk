@@ -6,7 +6,7 @@
 /*   By: rkerman <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:08:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/04/07 14:33:37 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/04/09 18:17:15 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,14 @@ long long	ft_atoi(char *str)
 
 void	signal_handler(int signum, siginfo_t *info, void *ucontext)
 {
-	(void)ucontext;
 	(void)info;
+	(void)ucontext;
 	if (signum == 10)
 		g_pause = 0;
+	if (signum == 12)
+	{
+		
+	}
 }
 
 int	ft_strlen(char *str)
@@ -62,7 +66,21 @@ int	ft_strlen(char *str)
 void	sender_str(int pid, char *str)
 {
 	int	itr;
+	int	len;
 
+	len = ft_strlen(str);
+	itr = 31;
+	while (itr >= 0)
+	{
+		while (g_pause)
+			usleep(0);
+		g_pause = 1;
+		if (len & (1 << itr))
+			kill(pid, SIGUSR1);
+		else
+			kill(pid, SIGUSR2);
+		itr--;
+	}
 	while (*str)
 	{
 		itr = 7;
@@ -78,6 +96,18 @@ void	sender_str(int pid, char *str)
 			itr--;
 		}
 		str++;
+	}
+	itr = 7;
+	while (itr >= 0)
+	{
+		while (g_pause)
+			usleep(0);
+		g_pause = 1;
+		if ('\0' & (1 << itr))
+			kill(pid, SIGUSR1);
+		else
+			kill(pid, SIGUSR2);
+		itr--;
 	}
 }
 
@@ -107,10 +137,10 @@ int	main(int argc, char **argv)
 
 	sig.sa_sigaction = signal_handler;
 	sigemptyset(&sig.sa_mask);
-	sig.sa_flags = SA_SIGINFO;
+	sig.sa_flags = SA_RESTART;
 	sigaction(SIGUSR1, &sig, NULL);
 	pid = ft_atoi(argv[1]);
 	if (argc - 1 == 2 && pid)
-		sender_len(pid, ft_atoi(argv[2]));
-		//sender_str(pid, argv[2]);
+		//sender_len(pid, ft_atoi(argv[2]));
+		sender_str(pid, argv[2]);
 }
