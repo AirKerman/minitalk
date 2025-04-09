@@ -6,13 +6,12 @@
 /*   By: rkerman <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:08:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/04/09 18:17:15 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/04/10 00:39:21 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 #include <stdio.h>
-
 
 int	g_pause;
 
@@ -49,7 +48,8 @@ void	signal_handler(int signum, siginfo_t *info, void *ucontext)
 		g_pause = 0;
 	if (signum == 12)
 	{
-		
+		write(2, "Error server\n", 13);
+		exit(0);
 	}
 }
 
@@ -63,72 +63,40 @@ int	ft_strlen(char *str)
 	return (i);
 }
 
+void	sender_char(int pid, int c, int itr)
+{
+	while (itr >= 0)
+	{
+		if (kill(pid, 0) == -1)
+		{
+			write(2, "Error pid\n", 10);
+			exit(0);
+		}
+		while (g_pause)
+			usleep(0);
+		g_pause = 1;
+		if (c & (1 << itr))
+			kill(pid, SIGUSR1);
+		else
+			kill(pid, SIGUSR2);
+		itr--;
+	}
+}
+
 void	sender_str(int pid, char *str)
 {
-	int	itr;
 	int	len;
 
 	len = ft_strlen(str);
-	itr = 31;
-	while (itr >= 0)
-	{
-		while (g_pause)
-			usleep(0);
-		g_pause = 1;
-		if (len & (1 << itr))
-			kill(pid, SIGUSR1);
-		else
-			kill(pid, SIGUSR2);
-		itr--;
-	}
+	sender_char(pid, len, 31);
 	while (*str)
 	{
-		itr = 7;
-		while (itr >= 0)
-		{
-			while (g_pause)
-				usleep(0);
-			g_pause = 1;
-			if (*str & (1 << itr))
-				kill(pid, SIGUSR1);
-			else
-				kill(pid, SIGUSR2);
-			itr--;
-		}
+		sender_char(pid, *str, 7);
 		str++;
 	}
-	itr = 7;
-	while (itr >= 0)
-	{
-		while (g_pause)
-			usleep(0);
-		g_pause = 1;
-		if ('\0' & (1 << itr))
-			kill(pid, SIGUSR1);
-		else
-			kill(pid, SIGUSR2);
-		itr--;
-	}
+	sender_char(pid, '\0', 7);
+	write(1, "Message sent successfuly\n", 25);
 }
-
-void	sender_len(int p, long long l)
-{
-	long long	itr;
-
-	itr = 63;
-	while (itr >= 0)
-	{
-		while (g_pause)
-			usleep(0);
-		g_pause = 1;
-		if (l & (1 << itr))
-			kill(p, SIGUSR1);
-		else
-			kill(p, SIGUSR2);
-		itr--;
-	}
-}
-
 
 int	main(int argc, char **argv)
 {
@@ -139,8 +107,8 @@ int	main(int argc, char **argv)
 	sigemptyset(&sig.sa_mask);
 	sig.sa_flags = SA_RESTART;
 	sigaction(SIGUSR1, &sig, NULL);
+	sigaction(SIGUSR2, &sig, NULL);
 	pid = ft_atoi(argv[1]);
 	if (argc - 1 == 2 && pid)
-		//sender_len(pid, ft_atoi(argv[2]));
 		sender_str(pid, argv[2]);
 }

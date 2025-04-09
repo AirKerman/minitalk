@@ -6,11 +6,13 @@
 /*   By: rkerman <rkerman@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:07:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/04/09 18:12:49 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/04/10 00:51:29 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
+
+int	g_bit;
 
 int	ft_strlen(char *str)
 {
@@ -55,7 +57,31 @@ void	ft_putpid(pid_t n)
 	}
 }
 
-#include <stdio.h>
+int	len_receiver(siginfo_t *info, int *len, int reset)
+{
+	static int	i;
+
+	if (!reset && i < 32)
+	{
+		if (info->si_signo == 10)
+			*len = (*len | (1 << (31 - i)));
+		kill(info->si_pid, SIGUSR1);
+		i++;
+		return (1);
+	}
+	else if (reset)
+	{
+		i = 0;
+		len = 0;
+	}
+	return (0);
+
+}
+
+void	character_treatment()
+{
+
+}
 
 void signal_handler(int signum, siginfo_t *info, void *ucontext)
 {
@@ -63,18 +89,9 @@ void signal_handler(int signum, siginfo_t *info, void *ucontext)
 	static char c;
 	static char *s;
 	static int		len;
-	static int		bit;
-	static int		i;
 	static int		j;
 
-	if (i < 32)
-	{
-		if (signum == 10)
-			len = (len | (1 << (31 - i)));
-		kill(info->si_pid, SIGUSR1);
-		i++;
-	}
-	else
+	if (!len_receiver(info, &len, 0))
 	{
 		if (!s)
 		{
@@ -82,17 +99,17 @@ void signal_handler(int signum, siginfo_t *info, void *ucontext)
 			if (!s)
 			{
 				kill(info->si_pid, SIGUSR2);
-				exit(1);
+				exit(0);
 			}
 		}
-		if (!bit)
-			bit = 8;
+		if (!g_bit)
+			g_bit = 8;
 		if (signum == 10)
-			c = (c & ~(1 << (bit - 1))) + (1 << (bit - 1));
+			c = (c & ~(1 << (g_bit - 1))) + (1 << (g_bit - 1));
 		if (signum == 12)
-			c = (c & ~(1 << (bit - 1)));
-		bit--;
-		if (!bit)
+			c = (c & ~(1 << (g_bit - 1)));
+		g_bit--;
+		if (!g_bit)
 		{
 			if (c != '\0')
 			{
@@ -102,9 +119,12 @@ void signal_handler(int signum, siginfo_t *info, void *ucontext)
 			else
 			{
 				s[j] = (char)c;
+				write(1, "[", 1);
+				ft_putpid(info->si_pid);
+				write(1, "] ", 2);
 				write(1, s, ft_strlen(s));
 				write(1, "\n", 1);
-				i = 0;
+				len_receiver(info, &len, 1);
 				j = 0;
 				free(s);
 				s = NULL;
