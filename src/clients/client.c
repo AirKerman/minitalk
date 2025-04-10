@@ -6,7 +6,7 @@
 /*   By: rkerman <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 13:08:32 by rkerman           #+#    #+#             */
-/*   Updated: 2025/04/10 00:39:21 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/04/10 14:58:03 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 int	g_pause;
 
-long long	ft_atoi(char *str)
+static long long	ft_atoi(char *str)
 {
 	long long	count;
 	long long	neg;
@@ -40,7 +40,7 @@ long long	ft_atoi(char *str)
 	return (count * neg);
 }
 
-void	signal_handler(int signum, siginfo_t *info, void *ucontext)
+static void	signal_handler(int signum, siginfo_t *info, void *ucontext)
 {
 	(void)info;
 	(void)ucontext;
@@ -53,17 +53,7 @@ void	signal_handler(int signum, siginfo_t *info, void *ucontext)
 	}
 }
 
-int	ft_strlen(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-
-void	sender_char(int pid, int c, int itr)
+static void	sender_char(int pid, int c, int itr)
 {
 	while (itr >= 0)
 	{
@@ -83,7 +73,7 @@ void	sender_char(int pid, int c, int itr)
 	}
 }
 
-void	sender_str(int pid, char *str)
+static void	sender_str(int pid, char *str)
 {
 	int	len;
 

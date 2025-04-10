@@ -1,6 +1,6 @@
-SRC_C		=	clients/client.c
+SRC_C		=	clients/client.c utils/utils.c
 
-SRC_S		=	servers/server.c
+SRC_S		=	servers/server.c servers/utils_s.c utils/utils.c
 
 OBJ_C		=	$(SRC_C:.c=.o)
 

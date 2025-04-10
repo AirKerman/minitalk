@@ -1,28 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minitalk.h                                         :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rkerman <rkerman@student.42.fr>            +#+  +:+       +#+        */
+/*   By: rkerman <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/24 21:22:39 by rkerman           #+#    #+#             */
-/*   Updated: 2025/04/10 14:58:44 by rkerman          ###   ########.fr       */
+/*   Created: 2025/04/10 14:34:33 by rkerman           #+#    #+#             */
+/*   Updated: 2025/04/10 14:41:29 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
-#include <signal.h>
-#include <stdlib.h>
+#include "minitalk.h"
 
-/*
-	Shared Utils
-*/
+int	ft_strlen(char *str)
+{
+	int	i;
 
-int		ft_strlen(char *str);
-
-/*
-	Server Utils
-*/
-
-void	banner(void);
-void	ft_putpid(pid_t n);
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
+}
